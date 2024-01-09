@@ -5,14 +5,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "dev": "node index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ethers": "^5",
-    "@thirdweb-dev/sdk": "^4",
-    "dotenv": "^16.0.3"
+    "@thirdweb-dev/sdk": "^4.0.25",
+    "dotenv": "^16.0.3",
+    "ethers": "^5"
   }
 }
