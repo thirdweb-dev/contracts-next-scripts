@@ -55,7 +55,7 @@ const main = async () => {
   let allHooks = await token.call("getAllHooks", []);
   console.log("\nAll hooks installed on token contract:", allHooks);
 
-  // This means the `beforeMint` hook is not install, and so, minting is not enabled yet.
+  // This means the `beforeMint` hook is not installed, and so, minting is not enabled yet.
   if (allHooks.beforeMint == ethers.constants.AddressZero) {
     console.log("\nInstalling the beforeMint hook...");
 
