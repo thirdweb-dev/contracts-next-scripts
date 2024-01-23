@@ -6,7 +6,7 @@ import { config } from "dotenv";
 
 config();
 
-// Run: `node erc721/allowlistMint/setClaimCondition.js`
+// Run: `node scripts/erc721/allowlistMint/setClaimCondition.js`
 
 const TARGET_HOOK_ADDRESS = "0x9Ef026c82F6491eBA4EAC14378a3FEd397C9F282";
 const TARGET_TOKEN_ADDRESS = "0x97694C602c283DE8f40B8f2679ED5E730806297a";

@@ -6,7 +6,7 @@ import { config } from "dotenv";
 
 config();
 
-// Run: `node erc721/allowlistMint/mint.js`
+// Run: `node scripts/erc721/allowlistMint/mint.js`
 
 const ALLOWLIST_ADDRESSES = ["0x2Ee4c2e9666Ff48DE2779EB6f33cDC342d761372"];
 const TARGET_TOKEN_ADDRESS = "0x97694C602c283DE8f40B8f2679ED5E730806297a";
