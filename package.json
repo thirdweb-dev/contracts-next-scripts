@@ -11,8 +11,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@thirdweb-dev/merkletree": "^0.2.0",
     "@thirdweb-dev/sdk": "^4.0.25",
     "dotenv": "^16.0.3",
-    "ethers": "^5"
+    "ethers": "^5",
+    "keccak256": "^1.0.6"
   }
 }
