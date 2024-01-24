@@ -3,7 +3,7 @@ import { ThirdwebSDK } from "@thirdweb-dev/sdk";
 
 // ABIs
 import ERC721_CORE_ABI from "./abi/ERC721Core.json" assert { type: "json" };
-import TOKEN_HOOK_ABI from "./abi/ITokenHook.json" assert { type: "json" };
+import ERC721_HOOK_ABI from "./abi/ERC721Hook.json" assert { type: "json" };
 import { ethers } from "ethers";
 
 config();
@@ -11,15 +11,15 @@ config();
 /**
  *  TO RUN THIS SCRIPT: `yarn dev`
  *
- *  This script is an example if minting tokens on an ERC-721 Core contract that uses hooks. In order, this script:
+ *  This script is an EXAMPLE of minting tokens on an ERC-721 Core contract that uses hooks. In order, this script:
  *   1. Installs the `beforeMint` hook on the ERC-721 Core contract (if not already present).
  *   2. Encodes the expected arguments for the `beforeMint` hook.
  *   3. Mints a new token.
  *
- *  The contract at `ERC721_BEFORE_MINT_HOOK_ADDRESS` works like a drop contract, via claim conditions. For example purposes,
+ *  The contract at `ERC721_BEFORE_MINT_HOOK_ADDRESS` is an `AllowlistMintHook` contract. For example purposes,
  *  this contract already has a claim condition set for a free mint, and no allowlist.
  *
- *  The contracts interacted with via this script can be found at: https://github.com/thirdweb-dev/contracts-next/pull/7
+ *  The contracts interacted with via this script can be found at: https://github.com/thirdweb-dev/contracts-next/
  */
 
 const main = async () => {
@@ -38,9 +38,9 @@ const main = async () => {
   });
 
   // This is the core token contract that uses hooks. Implements the `TokenHookConsumer` interface.
-  const ERC721_CORE_ADDRESS = "0x5513A5001A98495741BdeC77c7C6cae5AF46dE7d";
+  const ERC721_CORE_ADDRESS = "0x67F8C80274d87979B186E747282211A672E38c32";
   const ERC721_BEFORE_MINT_HOOK_ADDRESS =
-    "0x08fE631a040E98e13463fA3A263C14D420bB0123";
+    "0x9Ef026c82F6491eBA4EAC14378a3FEd397C9F282";
 
   const token = await sdk.getContractFromAbi(
     ERC721_CORE_ADDRESS,
@@ -49,7 +49,7 @@ const main = async () => {
 
   console.log(
     "\nTotal supply before minting:",
-    await token.erc721.totalCirculatingSupply()
+    (await token.erc721.totalCirculatingSupply()).toString()
   );
 
   let allHooks = await token.call("getAllHooks", []);
@@ -79,15 +79,21 @@ const main = async () => {
 
   const beforeMintHookContract = await sdk.getContractFromAbi(
     ERC721_BEFORE_MINT_HOOK_ADDRESS,
-    TOKEN_HOOK_ABI
+    ERC721_HOOK_ABI
   );
 
   const expectedEncoding = (
     await beforeMintHookContract.call("getBeforeMintArgSignature", [])
-  ).split(",");
+  ).split("|");
 
   console.log("\nExpected encoding format:", expectedEncoding);
 
+  /**
+   *  Here, we know beforehand to anticipate `bytes32[]` as the encoding type, because we know we're working with the
+   *  `AllowlistMintHook` contract. And so, we can provide the intended arguments to the hook in the expected format.
+   *
+   *  Therefore, it is expected that you know of the encoding format of the beforeMint hook that you're using.
+   */
   const encodedBeforeMintArgs = ethers.utils.defaultAbiCoder.encode(
     expectedEncoding,
     [[]]
@@ -107,7 +113,7 @@ const main = async () => {
 
   console.log(
     "\nTotal supply after mint:",
-    await token.erc721.totalCirculatingSupply()
+    (await token.erc721.totalCirculatingSupply()).toString()
   );
 };
 

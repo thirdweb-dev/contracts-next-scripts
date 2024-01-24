@@ -37,6 +37,20 @@
   },
   {
     "type": "function",
+    "name": "ROYALTY_INFO_FLAG",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "TOKEN_URI_FLAG",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "approve",
     "inputs": [
       { "name": "_spender", "type": "address", "internalType": "address" },
@@ -49,7 +63,7 @@
     "type": "function",
     "name": "balanceOf",
     "inputs": [
-      { "name": "owner", "type": "address", "internalType": "address" }
+      { "name": "_owner", "type": "address", "internalType": "address" }
     ],
     "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
     "stateMutability": "view"
@@ -65,13 +79,20 @@
   },
   {
     "type": "function",
+    "name": "contractURI",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "string", "internalType": "string" }],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "getAllHooks",
     "inputs": [],
     "outputs": [
       {
         "name": "hooks",
         "type": "tuple",
-        "internalType": "struct ITokenHookConsumer.HookImplementation",
+        "internalType": "struct IERC721HookInstaller.ERC721Hooks",
         "components": [
           {
             "name": "beforeMint",
@@ -90,6 +111,16 @@
           },
           {
             "name": "beforeApprove",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "tokenURI",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "royaltyInfo",
             "type": "address",
             "internalType": "address"
           }
@@ -144,7 +175,8 @@
         "internalType": "address"
       },
       { "name": "_name", "type": "string", "internalType": "string" },
-      { "name": "_symbol", "type": "string", "internalType": "string" }
+      { "name": "_symbol", "type": "string", "internalType": "string" },
+      { "name": "_uri", "type": "string", "internalType": "string" }
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
@@ -153,11 +185,7 @@
     "type": "function",
     "name": "installHook",
     "inputs": [
-      {
-        "name": "_hook",
-        "type": "address",
-        "internalType": "contract ITokenHook"
-      }
+      { "name": "_hook", "type": "address", "internalType": "contract IHook" }
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
@@ -174,18 +202,15 @@
   },
   {
     "type": "function",
-    "name": "metadataSourceOf",
-    "inputs": [{ "name": "_id", "type": "uint256", "internalType": "uint256" }],
-    "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
     "name": "mint",
     "inputs": [
       { "name": "_to", "type": "address", "internalType": "address" },
       { "name": "_quantity", "type": "uint256", "internalType": "uint256" },
-      { "name": "_data", "type": "bytes", "internalType": "bytes" }
+      {
+        "name": "_encodedBeforeMintArgs",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
     ],
     "outputs": [],
     "stateMutability": "payable"
@@ -247,7 +272,7 @@
       { "name": "_from", "type": "address", "internalType": "address" },
       { "name": "_to", "type": "address", "internalType": "address" },
       { "name": "_id", "type": "uint256", "internalType": "uint256" },
-      { "name": "data", "type": "bytes", "internalType": "bytes" }
+      { "name": "_data", "type": "bytes", "internalType": "bytes" }
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
@@ -264,12 +289,19 @@
   },
   {
     "type": "function",
+    "name": "setContractURI",
+    "inputs": [{ "name": "_uri", "type": "string", "internalType": "string" }],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "supportsInterface",
     "inputs": [
       { "name": "_interfaceId", "type": "bytes4", "internalType": "bytes4" }
     ],
     "outputs": [{ "name": "", "type": "bool", "internalType": "bool" }],
-    "stateMutability": "view"
+    "stateMutability": "pure"
   },
   {
     "type": "function",
@@ -282,9 +314,7 @@
     "type": "function",
     "name": "tokenURI",
     "inputs": [{ "name": "_id", "type": "uint256", "internalType": "uint256" }],
-    "outputs": [
-      { "name": "metadata", "type": "string", "internalType": "string" }
-    ],
+    "outputs": [{ "name": "", "type": "string", "internalType": "string" }],
     "stateMutability": "view"
   },
   {
@@ -309,11 +339,7 @@
     "type": "function",
     "name": "uninstallHook",
     "inputs": [
-      {
-        "name": "_hook",
-        "type": "address",
-        "internalType": "contract ITokenHook"
-      }
+      { "name": "_hook", "type": "address", "internalType": "contract IHook" }
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
@@ -370,13 +396,57 @@
   },
   {
     "type": "event",
+    "name": "ContractURIUpdated",
+    "inputs": [],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "HooksInstalled",
+    "inputs": [
+      {
+        "name": "implementation",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "hooks",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "HooksUninstalled",
+    "inputs": [
+      {
+        "name": "implementation",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "hooks",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
     "name": "Initialized",
     "inputs": [
       {
         "name": "version",
-        "type": "uint8",
+        "type": "uint64",
         "indexed": false,
-        "internalType": "uint8"
+        "internalType": "uint64"
       }
     ],
     "anonymous": false
@@ -393,44 +463,6 @@
       },
       {
         "name": "permissionBits",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "TokenHookInstalled",
-    "inputs": [
-      {
-        "name": "implementation",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "hooks",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "TokenHookUninstalled",
-    "inputs": [
-      {
-        "name": "implementation",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "hooks",
         "type": "uint256",
         "indexed": false,
         "internalType": "uint256"
@@ -470,7 +502,7 @@
       { "name": "tokenId", "type": "uint256", "internalType": "uint256" }
     ]
   },
-  { "type": "error", "name": "ERC721CoreMintNotAuthorized", "inputs": [] },
+  { "type": "error", "name": "ERC721CoreMintingDisabled", "inputs": [] },
   { "type": "error", "name": "ERC721InvalidRecipient", "inputs": [] },
   {
     "type": "error",
@@ -502,6 +534,11 @@
       { "name": "recipient", "type": "address", "internalType": "address" }
     ]
   },
+  { "type": "error", "name": "HookAlreadyInstalled", "inputs": [] },
+  { "type": "error", "name": "HookIsNotInstalled", "inputs": [] },
+  { "type": "error", "name": "HookNotAuthorized", "inputs": [] },
+  { "type": "error", "name": "InvalidInitialization", "inputs": [] },
+  { "type": "error", "name": "NotInitializing", "inputs": [] },
   {
     "type": "error",
     "name": "PermissionUnauthorized",
@@ -513,16 +550,5 @@
         "internalType": "uint256"
       }
     ]
-  },
-  {
-    "type": "error",
-    "name": "TokenHookConsumerHookAlreadyExists",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "TokenHookConsumerHookDoesNotExist",
-    "inputs": []
-  },
-  { "type": "error", "name": "TokenHookConsumerNotAuthorized", "inputs": [] }
+  }
 ]
