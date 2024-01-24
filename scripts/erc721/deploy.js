@@ -38,7 +38,7 @@ async function deployProxy(sdkInstance) {
     "",
   ]);
   const salt = ethers.utils.keccak256(
-    ethers.utils.defaultAbiCoder.encode(["address", "uint256"], [admin, 0])
+    ethers.utils.defaultAbiCoder.encode(["address", "uint256"], [admin, 1])
   );
 
   // DEPLOY

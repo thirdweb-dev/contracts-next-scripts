@@ -5,7 +5,7 @@ config();
 
 // Run: `node scripts/erc721/allowlistMint/setFeeConfig.js`
 
-const TARGET_TOKEN_ADDRESS = "0x97694C602c283DE8f40B8f2679ED5E730806297a";
+const TARGET_TOKEN_ADDRESS = "0x67F8C80274d87979B186E747282211A672E38c32";
 const TARGET_HOOK_ADDRESS = "0x9Ef026c82F6491eBA4EAC14378a3FEd397C9F282";
 
 async function setFeeConfig(sdkInstance) {

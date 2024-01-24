@@ -5,8 +5,8 @@ config();
 
 // Run: `node scripts/erc721/allowlistMint/installHook.js`
 
-const TARGET_TOKEN_ADDRESS = "0x97694C602c283DE8f40B8f2679ED5E730806297a";
-const TARGET_HOOK_ADDRESS = "0x9Ef026c82F6491eBA4EAC14378a3FEd397C9F282";
+const TARGET_TOKEN_ADDRESS = "0x67F8C80274d87979B186E747282211A672E38c32";
+const TARGET_HOOK_ADDRESS = "0xF407B42763F3F6414F8a2E504dc50F001c082e09";
 
 const INSTALL = 1;
 
@@ -33,7 +33,7 @@ async function main() {
     secretKey: SECRET_KEY,
   });
 
-  await installOrUninstallHook(sdk, INSTALL);
+  await installOrUninstallHook(sdk, 0);
 }
 
 main()
