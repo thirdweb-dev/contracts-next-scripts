@@ -6,6 +6,7 @@ import { config } from "dotenv";
 
 config();
 
+// Mints a token to an allowlisted address.
 // Run: `node scripts/erc721/allowlistMint/mint.js`
 
 const ALLOWLIST_ADDRESSES = ["0x2Ee4c2e9666Ff48DE2779EB6f33cDC342d761372"];

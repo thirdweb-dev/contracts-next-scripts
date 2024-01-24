@@ -4,6 +4,7 @@ import { ethers } from "ethers";
 
 config();
 
+// Uses a clone factory contract to deploy a minimal clone proxy contract for an implementation.
 // Run: `node scripts/erc721/deploy.js`
 
 const CLONE_FACTORY_ADDRESS = "0x276681b249D043dfd3e833fA2862B797dA2BF68E";

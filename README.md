@@ -2,7 +2,7 @@
 
 Scripts showing how to interact with [contracts-next](https://github.com/thirdweb-dev/contracts-next) using the thirdweb SDK.
 
-# Deployments
+# Deployments (Goerli)
 
 - `CloneFactory`: [0x276681b249D043dfd3e833fA2862B797dA2BF68E](https://thirdweb.com/goerli/0x276681b249D043dfd3e833fA2862B797dA2BF68E)
 

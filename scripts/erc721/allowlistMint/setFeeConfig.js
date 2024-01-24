@@ -3,6 +3,7 @@ import { config } from "dotenv";
 
 config();
 
+// Sets the fee config for a token.
 // Run: `node scripts/erc721/allowlistMint/setFeeConfig.js`
 
 const TARGET_TOKEN_ADDRESS = "0x67F8C80274d87979B186E747282211A672E38c32";

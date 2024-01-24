@@ -3,6 +3,7 @@ import { config } from "dotenv";
 
 config();
 
+// Installs or Uninstalls a hook in a token core contract.
 // Run: `node scripts/erc721/allowlistMint/installHook.js`
 
 const TARGET_TOKEN_ADDRESS = "0x67F8C80274d87979B186E747282211A672E38c32";

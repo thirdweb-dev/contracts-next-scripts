@@ -6,6 +6,7 @@ import { config } from "dotenv";
 
 config();
 
+// Sets the claim condition for a token.
 // Run: `node scripts/erc721/allowlistMint/setClaimCondition.js`
 
 const TARGET_HOOK_ADDRESS = "0x9Ef026c82F6491eBA4EAC14378a3FEd397C9F282";
