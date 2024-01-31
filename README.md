@@ -2,6 +2,29 @@
 
 Scripts showing how to interact with [contracts-next](https://github.com/thirdweb-dev/contracts-next) using the thirdweb SDK.
 
+```bash
+scripts/erc721/
+|
+|-- deploy: "deploy an ERC-721 core contract i.e. a minimal proxy for an ERC-721 Core contract."
+|-- installHook: "install a hook into a core contract."
+|
+|-- allowlistMint
+|   |-- setClaimConditions: "set a price and allowlist for your mint."
+|   |-- setFeeCongig: "set sale and fee recipients for your mint."
+|   |-- mint: "mint a token on your ERC-721 contract."
+|
+|-- royalty
+|   |-- setRoyaltyInfo: "set a default royalty recipient and BPS for your NFTs."
+|
+|-- metadata
+|   |-- lazyMint: "lazy mint metadata for your NFTs"
+```
+
+```bash
+# Install dependencies. Required: node v18^
+yarn install
+```
+
 # Deployments (Goerli)
 
 - `CloneFactory`: [0x276681b249D043dfd3e833fA2862B797dA2BF68E](https://thirdweb.com/goerli/0x276681b249D043dfd3e833fA2862B797dA2BF68E)
@@ -10,13 +33,10 @@ Scripts showing how to interact with [contracts-next](https://github.com/thirdwe
 
 **Core:**
 
-- `ERC721Core` _implementation_: [0x05bA337AC23E1bdb70aDA414aeA75260bCe6a71d](https://thirdweb.com/goerli/0x05bA337AC23E1bdb70aDA414aeA75260bCe6a71d)
+- `ERC721Core` _implementation_: [0x7720573Fe31a2f2fe523E24CC4904d0040947FA5](https://thirdweb.com/goerli/0x7720573Fe31a2f2fe523E24CC4904d0040947FA5)
 
 **Hooks:**
 
-- `AllowlistMintHook`: [0x81229f69f87d3d522C2f6f6e2afe58669F8EE649](https://thirdweb.com/goerli/0x81229f69f87d3d522C2f6f6e2afe58669F8EE649)
-- `DropMintHook`: [0xe8534Bb7b7321Aa7F51685cf09DDd475A9ec720C](https://thirdweb.com/goerli/0xe8534Bb7b7321Aa7F51685cf09DDd475A9ec720C)
-- `SignatureMintHook`: [0x9fbD223b0E561af7B3545e4A955338D6209ea49e](https://thirdweb.com/goerli/0x9fbD223b0E561af7B3545e4A955338D6209ea49e)
-- `SimpleMetadataHook`: [0x2c2d8B7A876d4C3c18b5993bEB0fBF10A50770FB](https://thirdweb.com/goerli/0x2c2d8B7A876d4C3c18b5993bEB0fBF10A50770FB)
-- `LazyMintMetadataHook`: [0xfe5B36Ea6c0732a07c401Ac51E2B293c59D7199e](https://thirdweb.com/goerli/0xfe5B36Ea6c0732a07c401Ac51E2B293c59D7199e)
-- `RoyaltyHook`: [0x50Bc84D0276e5093192e40b0879Bf74Ca5bFCb3a](https://thirdweb.com/goerli/0x50Bc84D0276e5093192e40b0879Bf74Ca5bFCb3a)
+- `AllowlistMintHookERC721`: [0xd2D7CD9F389bE8d6170df8e1B0908A78074da4BF](https://thirdweb.com/goerli/0xd2D7CD9F389bE8d6170df8e1B0908A78074da4BF)
+- `LazyMintMetadataHook`: [0xe9835BeA658343E5D56E5039b14A35c38Fc6De36](https://thirdweb.com/goerli/0xfe5B36Ea6c0732a07c401Ac51E2B293c59D7199e)
+- `RoyaltyHook`: [0x2eD5Abc5Ee2da6aCA33c2459d0331fB840771fd6](https://thirdweb.com/goerli/0x50Bc84D0276e5093192e40b0879Bf74Ca5bFCb3a)
