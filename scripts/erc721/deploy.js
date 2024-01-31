@@ -7,9 +7,6 @@ import ERC721_CORE_ABI from "../../abi/ERC721Core.json" assert { type: "json" };
 config();
 
 // Uses a clone factory contract to deploy a minimal clone proxy contract for an ERC-721 Core implementation.
-
-// CHAIN: Goerli
-
 // Run: `node scripts/erc721/deploy.js`
 
 const CLONE_FACTORY_ADDRESS = "0x276681b249D043dfd3e833fA2862B797dA2BF68E";

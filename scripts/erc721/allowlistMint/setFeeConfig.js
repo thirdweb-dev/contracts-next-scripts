@@ -6,14 +6,14 @@ config();
 // Sets the fee config for a token.
 // Run: `node scripts/erc721/allowlistMint/setFeeConfig.js`
 
-const TARGET_TOKEN_ADDRESS = "0x67F8C80274d87979B186E747282211A672E38c32";
-const TARGET_HOOK_ADDRESS = "0x9Ef026c82F6491eBA4EAC14378a3FEd397C9F282";
+const TARGET_TOKEN_ADDRESS = "0xa286645A6f51BE81f430517d435C22792f9CB9B7";
+const TARGET_HOOK_ADDRESS = "0xd2D7CD9F389bE8d6170df8e1B0908A78074da4BF";
 
 async function setFeeConfig(sdkInstance) {
   // FEE CONFIG PARAMS
   const primarySaleRecipient = "0x2Ee4c2e9666Ff48DE2779EB6f33cDC342d761372";
   const platformFeeRecipient = "0x2Ee4c2e9666Ff48DE2779EB6f33cDC342d761372";
-  const platformFeeBps = 100;
+  const platformFeeBps = 100; // 10_000 == 100%
 
   // SET
   const contract = await sdkInstance.getContract(TARGET_HOOK_ADDRESS);
