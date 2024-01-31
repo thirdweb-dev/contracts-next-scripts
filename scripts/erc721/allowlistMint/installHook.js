@@ -6,8 +6,8 @@ config();
 // Installs or Uninstalls a hook in a token core contract.
 // Run: `node scripts/erc721/allowlistMint/installHook.js`
 
-const TARGET_TOKEN_ADDRESS = "0x67F8C80274d87979B186E747282211A672E38c32";
-const TARGET_HOOK_ADDRESS = "0xF407B42763F3F6414F8a2E504dc50F001c082e09";
+const TARGET_TOKEN_ADDRESS = "0xa286645A6f51BE81f430517d435C22792f9CB9B7"; // REPLACE WITH YOUR TOKEN ADDRESS
+const TARGET_HOOK_ADDRESS = "0xd2D7CD9F389bE8d6170df8e1B0908A78074da4BF"; // ALLOWLIST MINT HOOK ADDRESS
 
 const INSTALL = 1;
 
@@ -34,7 +34,7 @@ async function main() {
     secretKey: SECRET_KEY,
   });
 
-  await installOrUninstallHook(sdk, 0);
+  await installOrUninstallHook(sdk, INSTALL);
 }
 
 main()

@@ -10,21 +10,21 @@ config();
 // Run: `node scripts/erc721/allowlistMint/mint.js`
 
 const ALLOWLIST_ADDRESSES = ["0x2Ee4c2e9666Ff48DE2779EB6f33cDC342d761372"];
-const TARGET_TOKEN_ADDRESS = "0x67F8C80274d87979B186E747282211A672E38c32";
+const TARGET_TOKEN_ADDRESS = "0xa286645A6f51BE81f430517d435C22792f9CB9B7"; // REPLACE WITH YOUR TOKEN ADDRESS
 
 async function mintToken(sdkInstance) {
   console.log("Minting tokens...");
 
   // MINT PARAMS
   const to = "0x2Ee4c2e9666Ff48DE2779EB6f33cDC342d761372";
-  const quantity = 10;
+  const quantity = 1;
   const encodedArgs = getAllowlistMerkleProof();
 
   // MINT CALL
   const contract = await sdkInstance.getContract(TARGET_TOKEN_ADDRESS);
   const call = (
     await contract.prepare("mint", [to, quantity, encodedArgs])
-  ).setValue(ethers.utils.parseEther("0.1"));
+  ).setValue(ethers.utils.parseEther("0.001"));
   const tx = await call.send();
 
   console.log("\nMint tx:", tx.hash);
