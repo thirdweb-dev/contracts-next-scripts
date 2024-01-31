@@ -9,8 +9,8 @@ config();
 // Sets the claim condition for a token.
 // Run: `node scripts/erc721/allowlistMint/setClaimCondition.js`
 
-const TARGET_HOOK_ADDRESS = "0x9Ef026c82F6491eBA4EAC14378a3FEd397C9F282";
-const TARGET_TOKEN_ADDRESS = "0x67F8C80274d87979B186E747282211A672E38c32";
+const TARGET_HOOK_ADDRESS = "0xd2D7CD9F389bE8d6170df8e1B0908A78074da4BF";
+const TARGET_TOKEN_ADDRESS = "0xa286645A6f51BE81f430517d435C22792f9CB9B7";
 const ALLOWLIST_ADDRESSES = ["0x2Ee4c2e9666Ff48DE2779EB6f33cDC342d761372"];
 
 function getAllowlistMerkleRoot() {
@@ -38,7 +38,7 @@ async function setClaimCondition(sdkInstance) {
   console.log("Setting claim condition...");
 
   // CLAIM CONDITION
-  const price = "10000000000000000"; // 0,01 ether
+  const price = "1000000000000000"; // 0,001 ether
   const availableSupply = 100;
   const allowlistMerkleRoot = getAllowlistMerkleRoot(); // EDIT: `ALLOWLIST_ADDRESSES`
 
