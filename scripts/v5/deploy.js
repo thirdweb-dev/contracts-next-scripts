@@ -6,9 +6,8 @@ import {
   waitForReceipt,
 } from "thirdweb";
 import { privateKeyWallet } from "thirdweb/wallets";
-import { config } from "dotenv";
 import { ethers } from "ethers";
-import ERC721_CORE_ABI from "../../abi/ERC721Core.json" assert { type: "json" };
+import { config } from "dotenv";
 
 config();
 
@@ -17,10 +16,38 @@ config();
 const CHAIN_ID = 5; // REPLACE WITH YOUR CHAIN ID
 const ADMIN = "0x..."; // REPLACE WITH YOUR ADDRESS
 
-const ERC_721_CORE_IMPL_ADDRESS = "0x..."; // REPLACE WITH ERC-721 CORE IMPLEMENTATION ADDRESS
+const CORE_IMPL_ADDRESS = "0x..."; // REPLACE WITH CORE IMPLEMENTATION ADDRESS
 const CLONE_FACTORY_ADDRESS = "0x..."; // REPLACE WITH CLONE FACTORY ADDRESS
 
-const ERC_721_CORE_INTERFACE = new ethers.utils.Interface(ERC721_CORE_ABI);
+const INITIALIZE_ABI = [
+  {
+    type: "function",
+    name: "initialize",
+    inputs: [
+      {
+        name: "_initCall",
+        type: "tuple",
+        internalType: "struct IInitCall.InitCall",
+        components: [
+          { name: "target", type: "address", internalType: "address" },
+          { name: "value", type: "uint256", internalType: "uint256" },
+          { name: "data", type: "bytes", internalType: "bytes" },
+        ],
+      },
+      { name: "_hooks", type: "address[]", internalType: "address[]" },
+      {
+        name: "_defaultAdmin",
+        type: "address",
+        internalType: "address",
+      },
+      { name: "_name", type: "string", internalType: "string" },
+      { name: "_symbol", type: "string", internalType: "string" },
+      { name: "_contractURI", type: "string", internalType: "string" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+];
 
 /// Setup thirdweb client and wallet.
 
@@ -40,18 +67,17 @@ const wallet = privateKeyWallet({ client, privateKey: PRIVATE_KEY });
 
 async function main() {
   // DEPLOY PARAMS
-  const implementation = ERC_721_CORE_IMPL_ADDRESS;
-  const initializeData = ERC_721_CORE_INTERFACE.encodeFunctionData(
-    "initialize",
-    [
-      { target: ethers.constants.AddressZero, value: 0, data: "0x" },
-      [],
-      ADMIN,
-      "Hooks NFT Collection",
-      "HNC",
-      "",
-    ]
-  );
+  const implementation = CORE_IMPL_ADDRESS;
+
+  const iface = new ethers.utils.Interface(INITIALIZE_ABI);
+  const initializeData = iface.encodeFunctionData("initialize", [
+    { target: ethers.constants.AddressZero, value: 0, data: "0x" },
+    [],
+    ADMIN,
+    "Hooks Token",
+    "HNC",
+    "",
+  ]);
   const salt = ethers.utils.keccak256(
     ethers.utils.defaultAbiCoder.encode(["address", "uint256"], [ADMIN, 0])
   );
@@ -64,7 +90,7 @@ async function main() {
   });
 
   const deployTransaction = prepareContractCall({
-    contract,
+    contract: cloneFactory,
     method:
       "function deployProxyByImplementation(address _implementation, bytes memory _data, bytes32 _salt)",
     params: [implementation, initializeData, salt],
