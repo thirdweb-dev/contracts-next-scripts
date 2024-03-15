@@ -8,6 +8,8 @@ import {
 import { privateKeyWallet } from "thirdweb/wallets";
 import { config } from "dotenv";
 
+import HookInstallerABI from "../abi/HookInstaller.json";
+
 config();
 
 // Constants
@@ -35,20 +37,19 @@ async function main() {
     client,
     address: TARGET_TOKEN_ADDRESS,
     chainId: CHAIN_ID,
+    abi: HookInstallerABI,
   });
 
   const installTransaction = prepareContractCall({
     contract: coreContract,
-    method: {
-      type: "function",
-      name: "installHook",
-      inputs: [
-        { name: "_hook", type: "address", internalType: "contract IHook" },
-      ],
-      outputs: [],
-      stateMutability: "nonpayable",
-    },
-    args: [TARGET_HOOK_ADDRESS],
+    method: "installHook",
+    args: [
+      {
+        hook: TARGET_HOOK_ADDRESS,
+        initCallValue: 0,
+        initCallData: "0x",
+      },
+    ],
   });
 
   // SEND TRANSACTION

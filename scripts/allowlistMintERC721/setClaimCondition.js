@@ -20,37 +20,32 @@ const CHAIN_ID = 5; // REPLACE WITH YOUR CHAIN ID
 const TARGET_TOKEN_ADDRESS = "0x..."; // REPLACE WITH YOUR TOKEN ADDRESS
 const ALLOWLIST_ADDRESSES = ["0x..."]; // REPLACE WITH ALLOWLIST ADDRESSES
 
-const BEFORE_MINT_HOOK_FLAG = 2;
-
-const SET_CLAIM_CONDITION_ABI = [
-  {
-    type: "function",
-    name: "setClaimCondition",
-    inputs: [
-      {
-        name: "_claimCondition",
-        type: "tuple",
-        internalType: "struct AllowlistMintHookERC721.ClaimCondition",
-        components: [
-          { name: "price", type: "uint256", internalType: "uint256" },
-          {
-            name: "availableSupply",
-            type: "uint256",
-            internalType: "uint256",
-          },
-          {
-            name: "allowlistMerkleRoot",
-            type: "bytes32",
-            internalType: "bytes32",
-          },
-        ],
-      },
-    ],
-    outputs: [],
-    stateMutability: "nonpayable",
-  },
-];
-
+const SET_CLAIM_CONDITION_ABI = {
+  type: "function",
+  name: "setClaimCondition",
+  inputs: [
+    {
+      name: "_claimCondition",
+      type: "tuple",
+      internalType: "struct AllowlistMintHookERC721.ClaimCondition",
+      components: [
+        { name: "price", type: "uint256", internalType: "uint256" },
+        {
+          name: "availableSupply",
+          type: "uint256",
+          internalType: "uint256",
+        },
+        {
+          name: "allowlistMerkleRoot",
+          type: "bytes32",
+          internalType: "bytes32",
+        },
+      ],
+    },
+  ],
+  outputs: [],
+  stateMutability: "nonpayable",
+};
 /// Setup thirdweb client and wallet.
 
 if (!PRIVATE_KEY || !SECRET_KEY) {
@@ -98,30 +93,10 @@ async function main() {
     chainId: CHAIN_ID,
   });
 
-  const encodedSetClaimConditionCall = new ethers.utils.Interface(
-    SET_CLAIM_CONDITION_ABI
-  ).encodeFunctionData("setDefaultFeeConfig", [
-    {
-      price,
-      availableSupply,
-      allowlistMerkleRoot,
-    },
-  ]);
-
   const setClaimConditionTransaction = prepareContractCall({
     contract: coreContract,
-    method: {
-      type: "function",
-      name: "hookFunctionWrite",
-      inputs: [
-        { name: "_hookFlag", type: "uint256", internalType: "uint256" },
-        { name: "_value", type: "uint256", internalType: "uint256" },
-        { name: "_data", type: "bytes", internalType: "bytes" },
-      ],
-      outputs: [{ name: "", type: "bytes", internalType: "bytes" }],
-      stateMutability: "payable",
-    },
-    args: [BEFORE_MINT_HOOK_FLAG, 0, encodedSetClaimConditionCall],
+    method: SET_CLAIM_CONDITION_ABI,
+    args: [{ price, availableSupply, allowlistMerkleRoot }],
   });
 
   // SEND TRANSACTION

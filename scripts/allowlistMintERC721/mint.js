@@ -12,6 +12,8 @@ import { config } from "dotenv";
 import { MerkleTree } from "@thirdweb-dev/merkletree";
 import keccak256 from "keccak256";
 
+import ERC721CoreABI from "../abi/ERC721Core.json";
+
 config();
 
 // Constants
@@ -46,13 +48,8 @@ function getAllowlistMerkleProof(recipient) {
     sortPairs: true,
   });
 
-  const expectedProof = tree.getHexProof(
+  const proof = tree.getHexProof(
     ethers.utils.solidityKeccak256(["address"], [recipient])
-  );
-
-  const proof = ethers.utils.defaultAbiCoder.encode(
-    ["bytes32[]"],
-    [expectedProof]
   );
 
   return proof;
@@ -60,35 +57,34 @@ function getAllowlistMerkleProof(recipient) {
 
 async function main() {
   // MINT PARAMS
-  const to = "0x..."; // REPLACE WITH ALLOWLISTED RECIPIENT ADDRESS
-  const quantity = 1;
-  const encodedArgs = getAllowlistMerkleProof();
+  // We fill the relevant fields our hook expects (minter, quantity, allowlistProof) and leave the rest empty.
+  const mintRequest = {
+    minter: "0x...", // REPLACE WITH ALLOWLISTED RECIPIENT ADDRESS
+    token: TARGET_TOKEN_ADDRESS,
+    tokenId: 0,
+    quantity: 1, // REPLACE WITH QUANTITY
+    pricePerToken: 0,
+    currency: ethers.constants.AddressZero,
+    allowlistProof: getAllowlistMerkleProof(),
+    signature: "0x",
+    sigValidityStartTimestamp: 0,
+    sigValidityEndTimestamp: 0,
+    sigUid: ethers.utils.formatBytes32String(""),
+    auxData: "0x",
+  };
 
   // SETUP TRANSACTION
   const coreContract = getContract({
     client,
     address: TARGET_TOKEN_ADDRESS,
     chainId: CHAIN_ID,
+    abi: ERC721CoreABI,
   });
 
   const mintTransaction = prepareContractCall({
     contract: coreContract,
-    method: {
-      type: "function",
-      name: "mint",
-      inputs: [
-        { name: "_to", type: "address", internalType: "address" },
-        { name: "_quantity", type: "uint256", internalType: "uint256" },
-        {
-          name: "_encodedBeforeMintArgs",
-          type: "bytes",
-          internalType: "bytes",
-        },
-      ],
-      outputs: [],
-      stateMutability: "payable",
-    },
-    args: [to, quantity, encodedArgs],
+    method: "mint",
+    args: [mintRequest],
   });
 
   // SEND TRANSACTION

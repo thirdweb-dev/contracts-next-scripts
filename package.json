@@ -15,6 +15,6 @@
     "dotenv": "^16.0.3",
     "ethers": "^5",
     "keccak256": "^1.0.6",
-    "thirdweb": "^1.0.0-alpha-3b5cc6903-20240216131418"
+    "thirdweb": "^1.0.0-beta-d09f49493bbfd5143567113d9dca734fb49d1ee0-20240315072730"
   }
 }
