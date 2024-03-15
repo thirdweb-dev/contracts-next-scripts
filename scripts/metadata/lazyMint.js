@@ -6,7 +6,6 @@ import {
   waitForReceipt,
 } from "thirdweb";
 import { privateKeyWallet } from "thirdweb/wallets";
-import { ethers } from "ethers";
 import { config } from "dotenv";
 
 config();
@@ -16,26 +15,21 @@ const CHAIN_ID = 5; // REPLACE WITH YOUR CHAIN ID
 
 const TARGET_TOKEN_ADDRESS = "0x..."; // REPLACE WITH YOUR TOKEN ADDRESS
 
-const TOKEN_URI_FLAG = 2 ** 5;
-
-const LAZY_MINT_ABI = [
-  {
-    type: "function",
-    name: "lazyMint",
-    inputs: [
-      { name: "_amount", type: "uint256", internalType: "uint256" },
-      {
-        name: "_baseURIForTokens",
-        type: "string",
-        internalType: "string",
-      },
-      { name: "_data", type: "bytes", internalType: "bytes" },
-    ],
-    outputs: [{ name: "batchId", type: "uint256", internalType: "uint256" }],
-    stateMutability: "nonpayable",
-  },
-];
-
+const LAZY_MINT_ABI = {
+  type: "function",
+  name: "lazyMint",
+  inputs: [
+    { name: "_amount", type: "uint256", internalType: "uint256" },
+    {
+      name: "_baseURIForTokens",
+      type: "string",
+      internalType: "string",
+    },
+    { name: "_data", type: "bytes", internalType: "bytes" },
+  ],
+  outputs: [{ name: "batchId", type: "uint256", internalType: "uint256" }],
+  stateMutability: "nonpayable",
+};
 /// Setup thirdweb client and wallet.
 
 if (!PRIVATE_KEY || !SECRET_KEY) {
@@ -62,24 +56,10 @@ async function main() {
     chainId: CHAIN_ID,
   });
 
-  const encodedLazyMintCall = new ethers.utils.Interface(
-    LAZY_MINT_ABI
-  ).encodeFunctionData("lazyMint", [quantity, baseURI, data]);
-
   const lazyMintTransaction = prepareContractCall({
     contract: coreContract,
-    method: {
-      type: "function",
-      name: "hookFunctionWrite",
-      inputs: [
-        { name: "_hookFlag", type: "uint256", internalType: "uint256" },
-        { name: "_value", type: "uint256", internalType: "uint256" },
-        { name: "_data", type: "bytes", internalType: "bytes" },
-      ],
-      outputs: [{ name: "", type: "bytes", internalType: "bytes" }],
-      stateMutability: "payable",
-    },
-    args: [TOKEN_URI_FLAG, 0, encodedLazyMintCall],
+    method: LAZY_MINT_ABI,
+    args: [quantity, baseURI, data],
   });
 
   // SEND TRANSACTION

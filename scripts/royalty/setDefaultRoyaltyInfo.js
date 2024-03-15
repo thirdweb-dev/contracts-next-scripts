@@ -6,7 +6,6 @@ import {
   waitForReceipt,
 } from "thirdweb";
 import { privateKeyWallet } from "thirdweb/wallets";
-import { ethers } from "ethers";
 import { config } from "dotenv";
 
 config();
@@ -16,25 +15,20 @@ const CHAIN_ID = 5; // REPLACE WITH YOUR CHAIN ID
 
 const TARGET_TOKEN_ADDRESS = "0x..."; // REPLACE WITH YOUR TOKEN ADDRESS
 
-const ROYALTY_FLAG = 2 ** 6;
-
-const SET_DEFAULT_ROYALTY_INFO_ABI = [
-  {
-    type: "function",
-    name: "setDefaultRoyaltyInfo",
-    inputs: [
-      {
-        name: "_royaltyRecipient",
-        type: "address",
-        internalType: "address",
-      },
-      { name: "_royaltyBps", type: "uint256", internalType: "uint256" },
-    ],
-    outputs: [],
-    stateMutability: "nonpayable",
-  },
-];
-
+const SET_DEFAULT_ROYALTY_INFO_ABI = {
+  type: "function",
+  name: "setDefaultRoyaltyInfo",
+  inputs: [
+    {
+      name: "_royaltyRecipient",
+      type: "address",
+      internalType: "address",
+    },
+    { name: "_royaltyBps", type: "uint256", internalType: "uint256" },
+  ],
+  outputs: [],
+  stateMutability: "nonpayable",
+};
 /// Setup thirdweb client and wallet.
 
 if (!PRIVATE_KEY || !SECRET_KEY) {
@@ -60,29 +54,15 @@ async function main() {
     chainId: CHAIN_ID,
   });
 
-  const encodedSetDefaultRoyaltyInfoCall = new ethers.utils.Interface(
-    SET_DEFAULT_ROYALTY_INFO_ABI
-  ).encodeFunctionData("setDefaultRoyaltyInfo", [
-    {
-      recipient,
-      bps,
-    },
-  ]);
-
   const setDefaultRoyaltyInfoTransaction = prepareContractCall({
     contract: coreContract,
-    method: {
-      type: "function",
-      name: "hookFunctionWrite",
-      inputs: [
-        { name: "_hookFlag", type: "uint256", internalType: "uint256" },
-        { name: "_value", type: "uint256", internalType: "uint256" },
-        { name: "_data", type: "bytes", internalType: "bytes" },
-      ],
-      outputs: [{ name: "", type: "bytes", internalType: "bytes" }],
-      stateMutability: "payable",
-    },
-    args: [ROYALTY_FLAG, 0, encodedSetDefaultRoyaltyInfoCall],
+    method: SET_DEFAULT_ROYALTY_INFO_ABI,
+    args: [
+      {
+        recipient,
+        bps,
+      },
+    ],
   });
 
   // SEND TRANSACTION
