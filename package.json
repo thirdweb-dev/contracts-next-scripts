@@ -13,8 +13,6 @@
   "dependencies": {
     "@thirdweb-dev/merkletree": "^0.2.0",
     "dotenv": "^16.0.3",
-    "ethers": "^5",
-    "keccak256": "^1.0.6",
-    "thirdweb": "^1.0.0-beta-d09f49493bbfd5143567113d9dca734fb49d1ee0-20240315072730"
+    "thirdweb": "^1.0.0-beta-75bec3710151c4255c8314e3ce8dd366265b6c58-20240317031400"
   }
 }

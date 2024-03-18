@@ -860,8 +860,5 @@
     "type": "error",
     "name": "TransferToNonERC721ReceiverImplementer",
     "inputs": []
-  },
-  { "type": "error", "name": "TransferToZeroAddress", "inputs": [] },
-  { "type": "error", "name": "URIQueryForNonexistentToken", "inputs": [] },
-  { "type": "error", "name": "Unauthorized", "inputs": [] }
+  }
 ]

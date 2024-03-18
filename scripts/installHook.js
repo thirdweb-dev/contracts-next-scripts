@@ -1,69 +1,52 @@
+import { PRIVATE_KEY, SECRET_KEY } from "./config.js";
 import {
   createThirdwebClient,
-  getContract,
   prepareContractCall,
+  getContract,
   sendTransaction,
   waitForReceipt,
 } from "thirdweb";
-import { privateKeyWallet } from "thirdweb/wallets";
-import { config } from "dotenv";
+import { privateKeyAccount } from "thirdweb/wallets";
+import { arbitrumSepolia } from "thirdweb/chains";
 
-import HookInstallerABI from "../abi/HookInstaller.json";
+import HOOKINSTALLER_ABI from "../abi/HookInstaller.json" assert { type: "json" };
 
-config();
-
-// Constants
-const CHAIN_ID = 5; // REPLACE WITH YOUR CHAIN ID
-
-const TARGET_TOKEN_ADDRESS = "0x..."; // REPLACE WITH YOUR TOKEN ADDRESS
-const TARGET_HOOK_ADDRESS = "0x..."; // REPLACE WITH HOOK ADDRESS
-
-/// Setup thirdweb client and wallet.
-
-if (!PRIVATE_KEY || !SECRET_KEY) {
-  throw new Error(
-    "Please set the TEST_WALLET_PRIVATE_KEY and THIRDWEB_SECRET_KEY env vars."
-  );
-}
+const TARGET_TOKEN_CORE_ADDRESS = "0xF3cD296A5a120FC8043E0e24C0e7857C24c29143"; // REPLACE WITH YOUR TOKEN ADDRESS
+const TARGET_HOOK_ADDRESS = "0x6f9336831ca70314A1939Ee9cb86dac05bD33a75"; // REPLACE WITH HOOK ADDRESS
 
 const client = createThirdwebClient({
   secretKey: SECRET_KEY,
 });
-const wallet = privateKeyWallet({ client, privateKey: PRIVATE_KEY });
 
-async function main() {
-  // SETUP INSTALL TRANSACTION
-  const coreContract = getContract({
-    client,
-    address: TARGET_TOKEN_ADDRESS,
-    chainId: CHAIN_ID,
-    abi: HookInstallerABI,
-  });
+const account = privateKeyAccount({
+  client,
+  privateKey: PRIVATE_KEY,
+});
 
-  const installTransaction = prepareContractCall({
-    contract: coreContract,
-    method: "installHook",
-    args: [
-      {
-        hook: TARGET_HOOK_ADDRESS,
-        initCallValue: 0,
-        initCallData: "0x",
-      },
-    ],
-  });
+const contract = getContract({
+  client,
+  address: TARGET_TOKEN_CORE_ADDRESS,
+  chain: arbitrumSepolia,
+  abi: HOOKINSTALLER_ABI,
+});
 
-  // SEND TRANSACTION
-  const transactionResult = await sendTransaction({
-    installTransaction,
-    wallet,
-  });
-  const receipt = await waitForReceipt(transactionResult);
-  console.log("Install hook tx:", receipt.transactionHash);
-}
+const tx = prepareContractCall({
+  contract,
+  method: "installHook",
+  params: [
+    {
+      hook: TARGET_HOOK_ADDRESS,
+      initCallValue: 0,
+      initCalldata: "0x",
+    },
+  ],
+});
 
-main()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+const result = await sendTransaction({
+  transaction: tx,
+  account: account,
+});
+
+const receipt = await waitForReceipt(result);
+
+console.log("Install hook:", receipt.transactionHash);

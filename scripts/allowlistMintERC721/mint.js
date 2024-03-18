@@ -1,46 +1,23 @@
+import { PRIVATE_KEY, SECRET_KEY } from "../config.js";
 import {
   createThirdwebClient,
-  getContract,
   prepareContractCall,
+  getContract,
   sendTransaction,
   waitForReceipt,
 } from "thirdweb";
-import { privateKeyWallet } from "thirdweb/wallets";
-import { ethers } from "ethers";
-import { config } from "dotenv";
-
+import { privateKeyAccount } from "thirdweb/wallets";
+import { arbitrumSepolia } from "thirdweb/chains";
+import { keccak256 } from "thirdweb/utils";
 import { MerkleTree } from "@thirdweb-dev/merkletree";
-import keccak256 from "keccak256";
 
-import ERC721CoreABI from "../abi/ERC721Core.json";
-
-config();
-
-// Constants
-const CHAIN_ID = 5; // REPLACE WITH YOUR CHAIN ID
-
-const TARGET_TOKEN_ADDRESS = "0x..."; // REPLACE WITH YOUR TOKEN ADDRESS
-const ALLOWLIST_ADDRESSES = ["0x..."]; // REPLACE WITH ALLOWLIST ADDRESSES
-
-/// Setup thirdweb client and wallet.
-
-if (!PRIVATE_KEY || !SECRET_KEY) {
-  throw new Error(
-    "Please set the TEST_WALLET_PRIVATE_KEY and THIRDWEB_SECRET_KEY env vars."
-  );
-}
-
-const client = createThirdwebClient({
-  secretKey: SECRET_KEY,
-});
-const wallet = privateKeyWallet({ client, privateKey: PRIVATE_KEY });
+import ERC721CORE_ABI from "../../abi/ERC721Core.json" assert { type: "json" };
 
 function getAllowlistMerkleProof(recipient) {
+  const ALLOWLIST_ADDRESSES = ["0x2Ee4c2e9666Ff48DE2779EB6f33cDC342d761372"]; // REPLACE WITH ALLOWLIST ADDRESSES
   console.log("Creating snapshot proof...");
 
-  const hashedLeafs = ALLOWLIST_ADDRESSES.map((l) =>
-    ethers.utils.solidityKeccak256(["address"], [l])
-  );
+  const hashedLeafs = ALLOWLIST_ADDRESSES.map((l) => keccak256(l));
 
   const tree = new MerkleTree(hashedLeafs, keccak256, {
     sort: true,
@@ -48,58 +25,54 @@ function getAllowlistMerkleProof(recipient) {
     sortPairs: true,
   });
 
-  const proof = tree.getHexProof(
-    ethers.utils.solidityKeccak256(["address"], [recipient])
-  );
+  const proof = tree.getHexProof(keccak256(recipient));
 
   return proof;
 }
 
-async function main() {
-  // MINT PARAMS
-  // We fill the relevant fields our hook expects (minter, quantity, allowlistProof) and leave the rest empty.
-  const mintRequest = {
-    minter: "0x...", // REPLACE WITH ALLOWLISTED RECIPIENT ADDRESS
-    token: TARGET_TOKEN_ADDRESS,
-    tokenId: 0,
-    quantity: 1, // REPLACE WITH QUANTITY
-    pricePerToken: 0,
-    currency: ethers.constants.AddressZero,
-    allowlistProof: getAllowlistMerkleProof(),
-    signature: "0x",
-    sigValidityStartTimestamp: 0,
-    sigValidityEndTimestamp: 0,
-    sigUid: ethers.utils.formatBytes32String(""),
-    auxData: "0x",
-  };
+const TARGET_TOKEN_CORE_ADDRESS = "0xF3cD296A5a120FC8043E0e24C0e7857C24c29143"; // REPLACE WITH YOUR TOKEN ADDRESS
 
-  // SETUP TRANSACTION
-  const coreContract = getContract({
-    client,
-    address: TARGET_TOKEN_ADDRESS,
-    chainId: CHAIN_ID,
-    abi: ERC721CoreABI,
-  });
+const client = createThirdwebClient({
+  secretKey: SECRET_KEY,
+});
 
-  const mintTransaction = prepareContractCall({
-    contract: coreContract,
-    method: "mint",
-    args: [mintRequest],
-  });
+const account = privateKeyAccount({
+  client,
+  privateKey: PRIVATE_KEY,
+});
 
-  // SEND TRANSACTION
-  const transactionResult = await sendTransaction({
-    mintTransaction,
-    wallet,
-  });
+const contract = getContract({
+  client,
+  address: TARGET_TOKEN_CORE_ADDRESS,
+  chain: arbitrumSepolia,
+  abi: ERC721CORE_ABI,
+});
 
-  const receipt = await waitForReceipt(transactionResult);
-  console.log("Mint tx:", receipt.transactionHash);
-}
+const mintRequest = {
+  minter: account.address, // REPLACE WITH ALLOWLISTED RECIPIENT ADDRESS
+  token: TARGET_TOKEN_CORE_ADDRESS,
+  tokenId: 0,
+  quantity: 1, // REPLACE WITH QUANTITY
+  pricePerToken: 0,
+  currency: "0x0000000000000000000000000000000000000000",
+  allowlistProof: getAllowlistMerkleProof(account.address),
+  signature: "0x",
+  sigValidityStartTimestamp: 0,
+  sigValidityEndTimestamp: 0,
+  sigUid: "0x0000000000000000000000000000000000000000000000000000000000000000",
+  auxData: "0x",
+};
+const tx = prepareContractCall({
+  contract,
+  method: "mint",
+  params: [mintRequest],
+});
 
-main()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+const result = await sendTransaction({
+  transaction: tx,
+  account: account,
+});
+
+const receipt = await waitForReceipt(result);
+
+console.log("Minting a token:", receipt.transactionHash);

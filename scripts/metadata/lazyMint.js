@@ -1,80 +1,43 @@
+import { PRIVATE_KEY, SECRET_KEY } from "../config.js";
 import {
   createThirdwebClient,
-  getContract,
   prepareContractCall,
+  getContract,
   sendTransaction,
   waitForReceipt,
 } from "thirdweb";
-import { privateKeyWallet } from "thirdweb/wallets";
-import { config } from "dotenv";
+import { privateKeyAccount } from "thirdweb/wallets";
+import { arbitrumSepolia } from "thirdweb/chains";
 
-config();
-
-// Constants
-const CHAIN_ID = 5; // REPLACE WITH YOUR CHAIN ID
-
-const TARGET_TOKEN_ADDRESS = "0x..."; // REPLACE WITH YOUR TOKEN ADDRESS
-
-const LAZY_MINT_ABI = {
-  type: "function",
-  name: "lazyMint",
-  inputs: [
-    { name: "_amount", type: "uint256", internalType: "uint256" },
-    {
-      name: "_baseURIForTokens",
-      type: "string",
-      internalType: "string",
-    },
-    { name: "_data", type: "bytes", internalType: "bytes" },
-  ],
-  outputs: [{ name: "batchId", type: "uint256", internalType: "uint256" }],
-  stateMutability: "nonpayable",
-};
-/// Setup thirdweb client and wallet.
-
-if (!PRIVATE_KEY || !SECRET_KEY) {
-  throw new Error(
-    "Please set the TEST_WALLET_PRIVATE_KEY and THIRDWEB_SECRET_KEY env vars."
-  );
-}
+const TARGET_TOKEN_CORE_ADDRESS = "0xF3cD296A5a120FC8043E0e24C0e7857C24c29143"; // REPLACE WITH YOUR TOKEN ADDRESS
 
 const client = createThirdwebClient({
   secretKey: SECRET_KEY,
 });
-const wallet = privateKeyWallet({ client, privateKey: PRIVATE_KEY });
 
-async function main() {
-  // METADATA PARAMS
-  const baseURI = "ipfs://QmSkXUpbwThMTzGg3e4kbGP8cKAa12vu8L3mLxywcmXyb4/";
-  const quantity = 3;
-  const data = "0x";
+const account = privateKeyAccount({
+  client,
+  privateKey: PRIVATE_KEY,
+});
 
-  // SETUP TRANSACTION
-  const coreContract = getContract({
-    client,
-    address: TARGET_TOKEN_ADDRESS,
-    chainId: CHAIN_ID,
-  });
+const contract = getContract({
+  client,
+  address: TARGET_TOKEN_CORE_ADDRESS,
+  chain: arbitrumSepolia,
+});
 
-  const lazyMintTransaction = prepareContractCall({
-    contract: coreContract,
-    method: LAZY_MINT_ABI,
-    args: [quantity, baseURI, data],
-  });
+const tx = prepareContractCall({
+  contract,
+  method:
+    "function lazyMint(uint256 _amount, string calldata _baseURIForTokens, bytes calldata _data)",
+  params: [10, "ipfs://QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/", "0x"],
+});
 
-  // SEND TRANSACTION
-  const transactionResult = await sendTransaction({
-    lazyMintTransaction,
-    wallet,
-  });
+const result = await sendTransaction({
+  transaction: tx,
+  account: account,
+});
 
-  const receipt = await waitForReceipt(transactionResult);
-  console.log("Lazy mint tx:", receipt.transactionHash);
-}
+const receipt = await waitForReceipt(result);
 
-main()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+console.log("Lazy minted tokens:", receipt.transactionHash);
