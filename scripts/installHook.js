@@ -18,7 +18,7 @@ const client = createThirdwebClient({
   secretKey: SECRET_KEY,
 });
 
-const wallet = privateKeyAccount({
+const account = privateKeyAccount({
   client,
   privateKey: PRIVATE_KEY,
 });
@@ -44,7 +44,7 @@ const tx = prepareContractCall({
 
 const result = await sendTransaction({
   transaction: tx,
-  account: wallet,
+  account: account,
 });
 
 const receipt = await waitForReceipt(result);
