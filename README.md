@@ -5,7 +5,6 @@ Scripts showing how to interact with [contracts-next](https://github.com/thirdwe
 ```bash
 scripts
 |
-|-- deploy: "deploy a token core contract i.e. a minimal proxy for an ERC-20/721/1155 Core contract."
 |-- installHook: "install a hook into a token core contract."
 |
 |-- allowlistMintERC721
