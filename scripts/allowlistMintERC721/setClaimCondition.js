@@ -1,70 +1,21 @@
+import { PRIVATE_KEY, SECRET_KEY } from "../config.js";
 import {
   createThirdwebClient,
-  getContract,
   prepareContractCall,
+  getContract,
   sendTransaction,
   waitForReceipt,
 } from "thirdweb";
-import { privateKeyWallet } from "thirdweb/wallets";
-import { ethers } from "ethers";
-import { config } from "dotenv";
-
+import { privateKeyAccount } from "thirdweb/wallets";
+import { arbitrumSepolia } from "thirdweb/chains";
+import { keccak256 } from "thirdweb/utils";
 import { MerkleTree } from "@thirdweb-dev/merkletree";
-import keccak256 from "keccak256";
-
-config();
-
-// Constants
-const CHAIN_ID = 5; // REPLACE WITH YOUR CHAIN ID
-
-const TARGET_TOKEN_ADDRESS = "0x..."; // REPLACE WITH YOUR TOKEN ADDRESS
-const ALLOWLIST_ADDRESSES = ["0x..."]; // REPLACE WITH ALLOWLIST ADDRESSES
-
-const SET_CLAIM_CONDITION_ABI = {
-  type: "function",
-  name: "setClaimCondition",
-  inputs: [
-    {
-      name: "_claimCondition",
-      type: "tuple",
-      internalType: "struct AllowlistMintHookERC721.ClaimCondition",
-      components: [
-        { name: "price", type: "uint256", internalType: "uint256" },
-        {
-          name: "availableSupply",
-          type: "uint256",
-          internalType: "uint256",
-        },
-        {
-          name: "allowlistMerkleRoot",
-          type: "bytes32",
-          internalType: "bytes32",
-        },
-      ],
-    },
-  ],
-  outputs: [],
-  stateMutability: "nonpayable",
-};
-/// Setup thirdweb client and wallet.
-
-if (!PRIVATE_KEY || !SECRET_KEY) {
-  throw new Error(
-    "Please set the TEST_WALLET_PRIVATE_KEY and THIRDWEB_SECRET_KEY env vars."
-  );
-}
-
-const client = createThirdwebClient({
-  secretKey: SECRET_KEY,
-});
-const wallet = privateKeyWallet({ client, privateKey: PRIVATE_KEY });
 
 function getAllowlistMerkleRoot() {
+  const ALLOWLIST_ADDRESSES = ["0x2Ee4c2e9666Ff48DE2779EB6f33cDC342d761372"]; // REPLACE WITH ALLOWLIST ADDRESSES
   console.log("Creating snapshot...");
 
-  const hashedLeafs = ALLOWLIST_ADDRESSES.map((l) =>
-    ethers.utils.solidityKeccak256(["address"], [l])
-  );
+  const hashedLeafs = ALLOWLIST_ADDRESSES.map((l) => keccak256(l));
 
   const tree = new MerkleTree(hashedLeafs, keccak256, {
     sort: true,
@@ -72,46 +23,68 @@ function getAllowlistMerkleRoot() {
     sortPairs: true,
   });
 
-  const merkleRoot = ethers.utils.defaultAbiCoder.encode(
-    ["bytes32"],
-    [tree.getHexRoot()]
-  );
-
-  return merkleRoot;
+  return tree.getHexRoot();
 }
 
-async function main() {
-  // CLAIM CONDITION
-  const price = "1000000000000000"; // 0,001 ether
-  const availableSupply = 100;
-  const allowlistMerkleRoot = getAllowlistMerkleRoot();
+const TARGET_TOKEN_CORE_ADDRESS = "0xF3cD296A5a120FC8043E0e24C0e7857C24c29143"; // REPLACE WITH YOUR TOKEN ADDRESS
 
-  // SETUP TRANSACTION
-  const coreContract = getContract({
-    client,
-    address: TARGET_TOKEN_ADDRESS,
-    chainId: CHAIN_ID,
-  });
+const client = createThirdwebClient({
+  secretKey: SECRET_KEY,
+});
 
-  const setClaimConditionTransaction = prepareContractCall({
-    contract: coreContract,
-    method: SET_CLAIM_CONDITION_ABI,
-    args: [{ price, availableSupply, allowlistMerkleRoot }],
-  });
+const account = privateKeyAccount({
+  client,
+  privateKey: PRIVATE_KEY,
+});
 
-  // SEND TRANSACTION
-  const transactionResult = await sendTransaction({
-    setClaimConditionTransaction,
-    wallet,
-  });
+const contract = getContract({
+  client,
+  address: TARGET_TOKEN_CORE_ADDRESS,
+  chain: arbitrumSepolia,
+});
 
-  const receipt = await waitForReceipt(transactionResult);
-  console.log("Set claim condition tx:", receipt.transactionHash);
-}
+const tx = prepareContractCall({
+  contract,
+  method: {
+    type: "function",
+    name: "setClaimCondition",
+    inputs: [
+      {
+        name: "_claimCondition",
+        type: "tuple",
+        internalType: "struct AllowlistMintHookERC721.ClaimCondition",
+        components: [
+          { name: "price", type: "uint256", internalType: "uint256" },
+          {
+            name: "availableSupply",
+            type: "uint256",
+            internalType: "uint256",
+          },
+          {
+            name: "allowlistMerkleRoot",
+            type: "bytes32",
+            internalType: "bytes32",
+          },
+        ],
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  params: [
+    {
+      price: 0,
+      availableSupply: 100,
+      allowlistMerkleRoot: getAllowlistMerkleRoot(),
+    },
+  ],
+});
 
-main()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+const result = await sendTransaction({
+  transaction: tx,
+  account: account,
+});
+
+const receipt = await waitForReceipt(result);
+
+console.log("Set claim conditions:", receipt.transactionHash);
